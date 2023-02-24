@@ -1,5 +1,5 @@
 import logo from './logo.svg';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 
 // Empty: 0x00
@@ -43,8 +43,34 @@ function Square({ index, chessPiece, dragStart, drop }) {
   );
 }
 
-function Board({ squares, onMove }) {
+function Board() {
+  const [state, setState] = useState([
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  ]);
+
   const [moveFrom, setMoveFrom] = useState(-1);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetch(`${window.location.pathname}/status`)
+        .then((response) => response.json())
+        .then((board) => setState(board));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const onMove = (from, to) => {
+    fetch(`${window.location.pathname}/move/${from}/${to}`, { method: 'POST' })
+      .then((response) => response.json())
+      .then((board) => setState(board));
+  }
 
   const dragStart = (e) => {
     let id = -1;
@@ -79,7 +105,7 @@ function Board({ squares, onMove }) {
     let rowContent = [];
     for (let column = 0; column < 8; ++column) {
       const squareIndex = row * 8 + column;
-      const rowElement = Square({ index: squareIndex, chessPiece: squares[squareIndex], dragStart, drop });
+      const rowElement = Square({ index: squareIndex, chessPiece: state[squareIndex], dragStart, drop });
       rowContent.push(rowElement);
     }
     const boardRow = <div className="board-row"> {rowContent} </div>;
@@ -91,26 +117,9 @@ function Board({ squares, onMove }) {
 
 
 function App() {
-  const [boardState, setBoardState] = useState([
-    0x20, 0x30, 0x40, 0x50, 0x60, 0x40, 0x30, 0x20,
-    0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x21, 0x31, 0x41, 0x51, 0x61, 0x41, 0x31, 0x21,
-    0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11,
-  ]);
-
-  const onMove = (from, to) => {
-    fetch(`http://127.0.0.1:5000/move/${from}/${to}`)
-      .then((response) => response.json())
-      .then((json) => setBoardState(json));
-  }
-
   return (
     <div className="App">
-      <Board squares={boardState} onMove={onMove} />
+      <Board />
     </div>
   );
 }
