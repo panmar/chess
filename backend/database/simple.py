@@ -1,18 +1,21 @@
-import psycopg2
-from psycopg2 import DatabaseError
+from psycopg import DatabaseError
+from psycopg_pool import ConnectionPool
 import json
+import atexit
 
-connection = psycopg2.connect(
-    host="localhost",
-    port=32768,
-    database="postgres",
-    user="postgres",
-    password="postgrespw",
+connection_info = (
+    "host=localhost port=32768 dbname=postgres user=postgres password=postgrespw"
 )
+pool = ConnectionPool(connection_info)
+
+
+@atexit.register
+def close_pool():
+    pool.close()
 
 
 def init():
-    with connection.cursor() as cursor:
+    with pool.connection() as connection, connection.cursor() as cursor:
         try:
             sql = """
                 DROP TABLE IF EXISTS BOARDS;
@@ -38,8 +41,9 @@ def init():
 
 init()
 
+
 def try_init_board(room_id, board):
-    with connection.cursor() as cursor:
+    with pool.connection() as connection, connection.cursor() as cursor:
         try:
             sql = f"""
                 INSERT INTO BOARDS(room_uuid, board)
@@ -51,10 +55,11 @@ def try_init_board(room_id, board):
             print(e)
             connection.rollback()
         else:
-            connection.commit()    
+            connection.commit()
+
 
 def set_board(room_id, board):
-    with connection.cursor() as cursor:
+    with pool.connection() as connection, connection.cursor() as cursor:
         try:
             sql = f"""
                 INSERT INTO BOARDS(room_uuid, board)
@@ -72,7 +77,7 @@ def set_board(room_id, board):
 
 
 def get_board(room_id):
-    with connection.cursor() as cursor:
+    with pool.connection() as connection, connection.cursor() as cursor:
         try:
             sql = f"""
                 SELECT board FROM BOARDS
@@ -92,7 +97,7 @@ def get_board(room_id):
 
 
 def join_player_with_color(cursor, room, color):
-    with connection.cursor() as cursor:
+    with pool.connection() as connection, connection.cursor() as cursor:
         try:
             sql = f"""
                 INSERT INTO ROOMS(room, color)
@@ -108,7 +113,7 @@ def join_player_with_color(cursor, room, color):
 
 
 def join_player(room):
-    with connection.cursor() as cursor:
+    with pool.connection() as connection, connection.cursor() as cursor:
         colors = ["white", "black"]
         for color in colors:
             if join_player_with_color(cursor, room, color):

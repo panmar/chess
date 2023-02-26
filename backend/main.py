@@ -2,10 +2,10 @@ from dataclasses import dataclass
 from logging import DEBUG
 from flask import Flask, make_response, jsonify, request, redirect, url_for
 import uuid
-import database_simple as db
+import database.simple as db
 
 
-app = Flask(__name__, static_folder="../chess-app/build/", static_url_path="")
+app = Flask(__name__, static_folder="../frontend/build/", static_url_path="")
 app.logger.setLevel(DEBUG)
 
 # fmt: off
