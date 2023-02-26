@@ -58,18 +58,20 @@ function Board() {
   const [moveFrom, setMoveFrom] = useState(-1);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      fetch(`${window.location.pathname}/status`)
-        .then((response) => response.json())
-        .then((board) => setState(board));
+    const interval = setInterval(async () => {
+      const url = `${window.location.pathname}/status`;
+      const response = await fetch(url);
+      const board = await response.json();
+      setState(board);
     }, 1000);
     return () => clearInterval(interval);
   }, []);
 
-  const onMove = (from, to) => {
-    fetch(`${window.location.pathname}/move/${from}/${to}`, { method: 'POST' })
-      .then((response) => response.json())
-      .then((board) => setState(board));
+  const onMove = async (from, to) => {
+    const url = `${window.location.pathname}/move/${from}/${to}`;
+    const response = await fetch(url, { method: 'POST' });
+    const board = await response.json();
+    setState(board);
   }
 
   const dragStart = (e) => {
