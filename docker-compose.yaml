@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    command: flask --app main run --host=${WWW_HOST} --port ${WWW_PORT} --debug
+    volumes:
+      - ./backend/:/usr/src/app/
+    ports:
+      - ${WWW_PORT}:${WWW_PORT}
+    environment:
+      - DB_USER=postgres
+      - DB_PASSWORD=postgrespw
+      - DB_NAME=chess
+    depends_on:
+      - db
+  db:
+    build: ./db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgrespw
+      - POSTGRES_DB=chess
+
+volumes:
+  postgres_data:
