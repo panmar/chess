@@ -12,10 +12,11 @@ services:
     ports:
       - ${WWW_PORT}:${WWW_PORT}
     environment:
+      - DB_HOST=db
+      - DB_PORT=5432
       - DB_USER=postgres
       - DB_PASSWORD=postgrespw
       - DB_NAME=chess
-      - DB_PORT=5432
     depends_on:
       - frontend
       - db
