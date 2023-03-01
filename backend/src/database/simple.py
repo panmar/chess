@@ -16,25 +16,6 @@ def connect():
     return psycopg.connect(connection_info)
 
 
-def create_db():
-    with connect() as connection:
-        sql = """
-            DROP TABLE IF EXISTS BOARDS;
-            CREATE TABLE IF NOT EXISTS BOARDS (
-                room_uuid UUID PRIMARY KEY,
-                board VARCHAR(250) NOT NULL
-            );
-
-            DROP TABLE IF EXISTS ROOMS;
-            CREATE TABLE IF NOT EXISTS ROOMS (
-                room UUID NOT NULL,
-                color VARCHAR(10) NOT NULL,
-                PRIMARY KEY (room, color)
-            );
-        """
-        connection.execute(sql)
-
-
 def try_init_board(room_id, board):
     with connect() as connection:
         sql = f"""
