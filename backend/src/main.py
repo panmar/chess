@@ -3,7 +3,7 @@ import uuid
 import database.simple as db
 
 
-app = Flask(__name__, static_folder="build/", static_url_path="")
+app = Flask(__name__, static_folder="../build/", static_url_path="")
 
 # fmt: off
 starting_board = [

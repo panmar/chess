@@ -1,11 +1,14 @@
 version: '3.8'
 
 services:
+  frontend:
+    build: ./frontend
+    image: frontend:build
   backend:
     build: ./backend
-    command: flask --app main run --host=${WWW_HOST} --port ${WWW_PORT} --debug
+    command: flask --app src/main run --host=${WWW_HOST} --port ${WWW_PORT} --debug
     volumes:
-      - ./backend/:/usr/src/app/
+      - ./backend/src/:/usr/src/app/src
     ports:
       - ${WWW_PORT}:${WWW_PORT}
     environment:
@@ -13,6 +16,7 @@ services:
       - DB_PASSWORD=postgrespw
       - DB_NAME=chess
     depends_on:
+      - frontend
       - db
   db:
     build: ./db
