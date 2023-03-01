@@ -20,11 +20,15 @@ starting_board = [
 
 
 def is_position_black(board, position):
+    if board[position] == 0:
+        return False
     return (board[position] % 16) == 0
 
 
 def is_position_white(board, position):
-    return not is_position_black(board, position)
+    if board[position] == 0:
+        return False
+    return (board[position] % 16) == 1
 
 
 @app.route("/")
@@ -66,6 +70,11 @@ def move(room_id, moveFrom, moveTo):
     board = db.get_board(room_id)
 
     if not color or (color == "observer"):
+        return jsonify(board)
+
+    if (color == "white" and is_position_white(board, moveTo)) or (
+        color == "black" and is_position_black(board, moveTo)
+    ):
         return jsonify(board)
 
     if color == "white" and is_position_black(board, moveFrom):
