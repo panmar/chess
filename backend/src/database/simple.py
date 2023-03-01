@@ -6,8 +6,9 @@ import json
 db_user = environ["DB_USER"]
 db_password = environ["DB_PASSWORD"]
 db_name = environ["DB_NAME"]
+db_port = environ["DB_PORT"]
 connection_info = (
-    f"host=db port=5432 dbname={db_name} user={db_user} password={db_password}"
+    f"host=db port={db_port} dbname={db_name} user={db_user} password={db_password}"
 )
 
 
